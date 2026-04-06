@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, profesores, alumnos, matricula, asistenciaIot, logsAcceso, Profesor, InsertProfesor, Alumno, InsertAlumno, Matricula, InsertMatricula, AsistenciaIot, InsertAsistenciaIot } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +89,128 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// Queries para Profesores
+export async function getProfesores() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(profesores);
+}
+
+export async function getProfesorById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(profesores).where(eq(profesores.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createProfesor(data: InsertProfesor) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(profesores).values(data);
+  return result;
+}
+
+export async function updateProfesor(id: number, data: Partial<InsertProfesor>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.update(profesores).set(data).where(eq(profesores.id, id));
+}
+
+export async function deleteProfesor(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.delete(profesores).where(eq(profesores.id, id));
+}
+
+// Queries para Alumnos
+export async function getAlumnos() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(alumnos);
+}
+
+export async function getAlumnoById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(alumnos).where(eq(alumnos.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getAlumnoByRfidTag(rfidTag: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(alumnos).where(eq(alumnos.rfidTag, rfidTag)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createAlumno(data: InsertAlumno) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(alumnos).values(data);
+  return result;
+}
+
+export async function updateAlumno(id: number, data: Partial<InsertAlumno>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.update(alumnos).set(data).where(eq(alumnos.id, id));
+}
+
+export async function deleteAlumno(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.delete(alumnos).where(eq(alumnos.id, id));
+}
+
+// Queries para Matrícula
+export async function getMatriculas() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(matricula);
+}
+
+export async function getMatriculaByAlumnoId(alumnoId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(matricula).where(eq(matricula.alumnoId, alumnoId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createMatricula(data: InsertMatricula) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(matricula).values(data);
+  return result;
+}
+
+export async function updateMatricula(id: number, data: Partial<InsertMatricula>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.update(matricula).set(data).where(eq(matricula.id, id));
+}
+
+// Queries para Asistencia IoT
+export async function getAsistenciasIot() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(asistenciaIot);
+}
+
+export async function getAsistenciasByAlumnoId(alumnoId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(asistenciaIot).where(eq(asistenciaIot.alumnoId, alumnoId));
+}
+
+export async function createAsistenciaIot(data: InsertAsistenciaIot) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(asistenciaIot).values(data);
+  return result;
+}
+
+export async function updateAsistenciaIot(id: number, data: Partial<InsertAsistenciaIot>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.update(asistenciaIot).set(data).where(eq(asistenciaIot.id, id));
+}
