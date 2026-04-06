@@ -27,16 +27,14 @@ export function MonitorIoT() {
   const [registros, setRegistros] = useState<RegistroAsistencia[]>([]);
   const [isLive, setIsLive] = useState(true);
 
-  const { data: asistencias } = trpc.asistencia.list.useQuery({
-    limite: 50,
-  });
+  const { data: asistencias } = trpc.asistencia.list.useQuery();
 
   useEffect(() => {
     if (asistencias) {
       setRegistros(
         asistencias.map((a) => ({
           id: a.id,
-          alumno_nombre: a.alumno_nombre || "Desconocido",
+          alumno_nombre: `Alumno ${a.alumno_id}`,
           estado: a.estado as "Puntual" | "Tardanza" | "Ausente",
           hora: new Date(a.timestamp).toLocaleTimeString(),
           rfid_uid: a.rfid_uid,

@@ -5,6 +5,7 @@ import { trpc } from "@/lib/trpc";
 import "../theme.css";
 
 interface AlumnoForm {
+  codigoSiagie: string;
   dni: string;
   nombres: string;
   apellidoPaterno: string;
@@ -12,13 +13,13 @@ interface AlumnoForm {
   genero: "M" | "F" | "Otro";
   fechaNacimiento: string;
   rfidTag: string;
-  grado: string;
-  seccion: string;
-  telefono: string;
-  email: string;
+  grado?: string;
+  seccion?: string;
+  nivel: "Primaria" | "Secundaria";
 }
 
 const initialForm: AlumnoForm = {
+  codigoSiagie: "",
   dni: "",
   nombres: "",
   apellidoPaterno: "",
@@ -26,10 +27,7 @@ const initialForm: AlumnoForm = {
   genero: "M",
   fechaNacimiento: "",
   rfidTag: "",
-  grado: "",
-  seccion: "",
-  telefono: "",
-  email: "",
+  nivel: "Primaria",
 };
 
 export default function Alumnos() {
@@ -211,14 +209,7 @@ export default function Alumnos() {
               <option value="D">D</option>
             </select>
           </div>
-          <div className="form-group">
-            <label className="form-label">Teléfono</label>
-            <input type="tel" className="form-input" value={formData.telefono} onChange={(e) => setFormData({ ...formData, telefono: e.target.value })} />
-          </div>
-          <div className="form-group">
-            <label className="form-label">Email</label>
-            <input type="email" className="form-input" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
-          </div>
+
         </form>
       </Modal>
 

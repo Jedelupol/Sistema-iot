@@ -53,10 +53,7 @@ export default function Profesores() {
     e.preventDefault();
     if (!validateForm()) return;
     try {
-      await createMutation.mutateAsync({
-        ...formData,
-        fechaNacimiento: new Date(formData.fechaNacimiento),
-      });
+      await createMutation.mutateAsync(formData);
       setFormData(initialForm);
       setIsModalOpen(false);
     } catch (error) {

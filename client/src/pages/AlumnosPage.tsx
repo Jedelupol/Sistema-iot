@@ -22,14 +22,17 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
 interface AlumnoForm {
-  codigo_siagie: string;
+  codigoSiagie: string;
   dni: string;
   nombres: string;
-  apellido_paterno: string;
-  apellido_materno: string;
-  rfid_tag: string;
-  grado: string;
-  seccion: string;
+  apellidoPaterno: string;
+  apellidoMaterno: string;
+  genero: "M" | "F" | "Otro";
+  fechaNacimiento: string;
+  rfidTag: string;
+  grado?: string;
+  seccion?: string;
+  nivel: "Primaria" | "Secundaria";
 }
 
 export function AlumnosPage() {
@@ -37,33 +40,33 @@ export function AlumnosPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState<AlumnoForm>({
-    codigo_siagie: "",
+    codigoSiagie: "",
     dni: "",
     nombres: "",
-    apellido_paterno: "",
-    apellido_materno: "",
-    rfid_tag: "",
-    grado: "",
-    seccion: "",
+    apellidoPaterno: "",
+    apellidoMaterno: "",
+    genero: "M",
+    fechaNacimiento: "",
+    rfidTag: "",
+    nivel: "Primaria",
   });
 
-  const { data: alumnos, refetch } = trpc.alumnos.list.useQuery({
-    search: searchTerm,
-  });
+  const { data: alumnos, refetch } = trpc.alumnos.list.useQuery();
 
   const createMutation = trpc.alumnos.create.useMutation({
     onSuccess: () => {
       toast.success("Alumno creado exitosamente");
       setShowModal(false);
       setFormData({
-        codigo_siagie: "",
+        codigoSiagie: "",
         dni: "",
         nombres: "",
-        apellido_paterno: "",
-        apellido_materno: "",
-        rfid_tag: "",
-        grado: "",
-        seccion: "",
+        apellidoPaterno: "",
+        apellidoMaterno: "",
+        genero: "M",
+        fechaNacimiento: "",
+        rfidTag: "",
+        nivel: "Primaria",
       });
       refetch();
     },
@@ -84,21 +87,25 @@ export function AlumnosPage() {
 
   const handleSubmit = () => {
     if (
-      !formData.codigo_siagie ||
+      !formData.codigoSiagie ||
       !formData.nombres ||
-      !formData.apellido_paterno ||
-      !formData.rfid_tag
+      !formData.apellidoPaterno ||
+      !formData.rfidTag ||
+      !formData.fechaNacimiento
     ) {
       toast.error("Por favor completa todos los campos obligatorios");
       return;
     }
 
-    createMutation.mutate(formData);
+    createMutation.mutate({
+      ...formData,
+      fechaNacimiento: new Date(formData.fechaNacimiento),
+    });
   };
 
   const handleDelete = (id: number) => {
     if (confirm("¿Estás seguro de que deseas eliminar este alumno?")) {
-      deleteMutation.mutate({ id });
+      deleteMutation.mutate(id);
     }
   };
 
@@ -114,16 +121,17 @@ export function AlumnosPage() {
         <Button
           onClick={() => {
             setEditingId(null);
-            setFormData({
-              codigo_siagie: "",
-              dni: "",
-              nombres: "",
-              apellido_paterno: "",
-              apellido_materno: "",
-              rfid_tag: "",
-              grado: "",
-              seccion: "",
-            });
+      setFormData({
+        codigoSiagie: "",
+        dni: "",
+        nombres: "",
+        apellidoPaterno: "",
+        apellidoMaterno: "",
+        genero: "M",
+        fechaNacimiento: "",
+        rfidTag: "",
+        nivel: "Primaria",
+      });
             setShowModal(true);
           }}
           className="bg-blue-600 hover:bg-blue-700"
@@ -226,9 +234,9 @@ export function AlumnosPage() {
                 Código SIAGIE *
               </label>
               <Input
-                value={formData.codigo_siagie}
+                value={formData.codigoSiagie}
                 onChange={(e) =>
-                  setFormData({ ...formData, codigo_siagie: e.target.value })
+                  setFormData({ ...formData, codigoSiagie: e.target.value })
                 }
                 placeholder="14 dígitos"
                 maxLength={14}
@@ -264,9 +272,9 @@ export function AlumnosPage() {
                 Apellido Paterno *
               </label>
               <Input
-                value={formData.apellido_paterno}
+                value={formData.apellidoPaterno}
                 onChange={(e) =>
-                  setFormData({ ...formData, apellido_paterno: e.target.value })
+                  setFormData({ ...formData, apellidoPaterno: e.target.value })
                 }
                 className="mt-1"
               />
@@ -276,21 +284,65 @@ export function AlumnosPage() {
                 Apellido Materno
               </label>
               <Input
-                value={formData.apellido_materno}
+                value={formData.apellidoMaterno}
                 onChange={(e) =>
-                  setFormData({ ...formData, apellido_materno: e.target.value })
+                  setFormData({ ...formData, apellidoMaterno: e.target.value })
                 }
                 className="mt-1"
               />
             </div>
             <div>
               <label className="text-sm font-medium text-slate-700">
+                Género
+              </label>
+              <select
+                value={formData.genero}
+                onChange={(e) =>
+                  setFormData({ ...formData, genero: e.target.value as "M" | "F" | "Otro" })
+                }
+                className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm mt-1"
+              >
+                <option value="M">Masculino</option>
+                <option value="F">Femenino</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-slate-700">
+                Fecha de Nacimiento *
+              </label>
+              <Input
+                type="date"
+                value={formData.fechaNacimiento}
+                onChange={(e) =>
+                  setFormData({ ...formData, fechaNacimiento: e.target.value })
+                }
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-slate-700">
+                Nivel *
+              </label>
+              <select
+                value={formData.nivel}
+                onChange={(e) =>
+                  setFormData({ ...formData, nivel: e.target.value as "Primaria" | "Secundaria" })
+                }
+                className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm mt-1"
+              >
+                <option value="Primaria">Primaria</option>
+                <option value="Secundaria">Secundaria</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-slate-700">
                 RFID Tag *
               </label>
               <Input
-                value={formData.rfid_tag}
+                value={formData.rfidTag}
                 onChange={(e) =>
-                  setFormData({ ...formData, rfid_tag: e.target.value })
+                  setFormData({ ...formData, rfidTag: e.target.value })
                 }
                 placeholder="UID de tarjeta"
                 className="mt-1"

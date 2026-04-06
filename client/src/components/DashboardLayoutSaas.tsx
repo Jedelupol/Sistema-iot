@@ -94,11 +94,11 @@ export function DashboardLayoutSaas({
               className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 transition-colors"
             >
               <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-                {user?.name?.charAt(0).toUpperCase() || "U"}
+                {user?.nombre?.charAt(0).toUpperCase() || "U"}
               </div>
               {sidebarOpen && (
                 <span className="text-xs truncate flex-1 text-left">
-                  {user?.name || "Usuario"}
+                  {user?.nombre || "Usuario"}
                 </span>
               )}
             </button>
@@ -138,7 +138,7 @@ export function DashboardLayoutSaas({
             </p>
           </div>
           <div className="text-right text-sm text-slate-600">
-            <p className="font-medium">{user?.name}</p>
+            <p className="font-medium">{user?.nombre}</p>
             <p className="text-xs text-slate-500">{user?.email}</p>
           </div>
         </header>

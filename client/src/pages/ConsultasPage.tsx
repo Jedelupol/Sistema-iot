@@ -21,7 +21,7 @@ export function ConsultasPage() {
   const [fechaFin, setFechaFin] = useState("");
   const [resultados, setResultados] = useState<any[]>([]);
 
-  const { data: alumnos } = trpc.alumnos.list.useQuery({});
+  const { data: alumnos } = trpc.alumnos.list.useQuery();
 
   const handleBuscar = () => {
     if (!busqueda) {

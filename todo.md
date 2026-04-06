@@ -9,19 +9,19 @@
 - [x] Implementar tipo_licencia (ENUM: BASICA, PRO, ELITE)
 - [x] Implementar modulos_autorizados (JSON: ["iot", "siagie", "whatsapp", etc])
 - [x] Agregar campos de vencimiento de licencia
-- [ ] Crear lógica de validación por licencia en routers tRPC
-- [ ] Implementar middleware que bloquea acceso a módulos no autorizados
+- [x] Crear lógica de validación por licencia en routers tRPC
+- [x] Implementar middleware que bloquea acceso a módulos no autorizados
 
 ### PILAR 2: Identidad Estudiantil e Importador SIAGIE
 - [x] Crear tabla `alumnos` con codigo_siagie (14 dígitos) como PRIMARY KEY UNIQUE
 - [x] Mantener dni (8 dígitos) como UNIQUE pero permitiendo nulos
 - [x] Agregar campos: nombres, apellido_paterno, apellido_materno, genero, fecha_nacimiento
 - [x] Agregar campos: rfid_tag, grado, seccion, nivel (Primaria/Secundaria), estado, fecha_matricula
-- [ ] Crear endpoint POST `/api/importar/acta-siagie` para importación masiva
-- [ ] Implementar parser de Excel/CSV que localiza columna de estudiantes
-- [ ] Implementar lógica de UPSERT basada en codigo_siagie
-- [ ] Crear tabla `importaciones_siagie` para auditoría de importaciones
-- [ ] Validar que codigo_siagie no se duplica durante importación
+- [x] Crear endpoint POST `/api/importar/acta-siagie` para importación masiva
+- [x] Implementar parser de Excel/CSV que localiza columna de estudiantes
+- [x] Implementar lógica de UPSERT basada en codigo_siagie
+- [x] Crear tabla `importaciones_siagie` para auditoría de importaciones
+- [x] Validar que codigo_siagie no se duplica durante importación
 
 ### PILAR 3: Horarios Dinámicos y Motor de Asistencia IoT
 - [x] Crear tabla `sesiones_docente` con: profesor_id, dia_semana, hora_inicio, hora_fin, curso
@@ -29,27 +29,27 @@
 - [x] Crear tabla `asistencia_iot` con: rfid_uid, timestamp, tipo_evento (Entrada/Salida), estado
 - [x] Agregar campo sesion_id para vincular con sesiones_docente
 - [x] Agregar campo estado (Puntual/Tardanza/Ausente)
-- [ ] Actualizar endpoint POST `/api/iot/asistencia` para:
-  - [ ] Recibir rfidUid del ESP32
-  - [ ] Validar que RFID existe en alumnos o profesores
-  - [ ] Buscar sesiones_docente del día actual
-  - [ ] Comparar timestamp contra hora_inicio para calcular estado
-  - [ ] Registrar asistencia con estado automático
-  - [ ] Retornar datos del alumno/profesor para notificaciones
-- [ ] Crear lógica de cálculo: Puntual (timestamp <= hora_inicio), Tardanza (timestamp > hora_inicio)
+- [x] Actualizar endpoint POST `/api/iot/asistencia` para:
+  - [x] Recibir rfidUid del ESP32
+  - [x] Validar que RFID existe en alumnos o profesores
+  - [x] Buscar sesiones_docente del día actual
+  - [x] Comparar timestamp contra hora_inicio para calcular estado
+  - [x] Registrar asistencia con estado automático
+  - [x] Retornar datos del alumno/profesor para notificaciones
+- [x] Crear lógica de cálculo: Puntual (timestamp <= hora_inicio), Tardanza (timestamp > hora_inicio)
 
 ### PILAR 4: Alertas Tempranas de Deserción
 - [x] Crear tabla `alertas_desercion` con: alumno_id, nivel_riesgo, fecha_deteccion, estado_revision
 - [x] Agregar campos: razon, revisado_por, fecha_revision, notas_director
 - [x] Agregar campo estado_revision (Pendiente/Revisado/Resuelto/Descartado)
-- [ ] Crear worker/CRON que ejecute semanalmente:
-  - [ ] Evalúa tabla asistencia_iot de los últimos 7 días
-  - [ ] Cuenta faltas por alumno (registros con estado = "Ausente")
-  - [ ] Si alumno >= 3 faltas en 7 días: inserta alerta con nivel_riesgo = "Alto"
-  - [ ] Si alumno >= 2 faltas en 7 días: inserta alerta con nivel_riesgo = "Medio"
-  - [ ] Evita duplicados: no inserta si ya existe alerta Pendiente para ese alumno
-- [ ] Crear endpoint GET `/api/alertas/desercion` para dashboard del director
-- [ ] Crear notificación automática al director cuando se detecta alerta
+- [x] Crear worker/CRON que ejecute semanalmente:
+  - [x] Evalúa tabla asistencia_iot de los últimos 7 días
+  - [x] Cuenta faltas por alumno (registros con estado = "Ausente")
+  - [x] Si alumno >= 3 faltas en 7 días: inserta alerta con nivel_riesgo = "Alto"
+  - [x] Si alumno >= 2 faltas en 7 días: inserta alerta con nivel_riesgo = "Medio"
+  - [x] Evita duplicados: no inserta si ya existe alerta Pendiente para ese alumno
+- [x] Crear endpoint GET `/api/alertas/desercion` para dashboard del director
+- [x] Crear notificación automática al director cuando se detecta alerta
 
 ---
 
@@ -97,7 +97,7 @@
 - [x] Verificar que licencia bloquea módulos no autorizados
 - [x] Verificar que sesiones_docente calcula estado de asistencia correctamente
 - [x] Verificar que alertas de deserción se generan automáticamente
-- [ ] Crear checkpoint de arquitectura core
+- [x] Crear checkpoint de arquitectura core
 
 ---
 
@@ -129,6 +129,9 @@
 - [x] Página SeguridadPage con gestión de usuarios
 - [x] App.tsx actualizado con rutas y autenticación
 - [x] Servicio CallMeBotService para notificaciones WhatsApp
+- [x] Todos los errores de TypeScript corregidos
+- [x] Servidor compilando sin errores
+- [x] Pantalla de login verificada y funcional
 
 ---
 

@@ -29,6 +29,7 @@ export function registerOAuthRoutes(app: Express) {
       }
 
       await db.upsertUser({
+        institucion_id: 1,
         openId: userInfo.openId,
         nombre: userInfo.name || null,
         email: userInfo.email ?? null,

@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, profesores, alumnos, Profesor, InsertProfesor, Alumno, InsertAlumno, asistencia_iot, InsertAsistenciaIot, alertas_desercion } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -31,11 +31,12 @@ export async function upsertUser(user: InsertUser): Promise<void> {
 
   try {
     const values: InsertUser = {
+      institucion_id: user.institucion_id || 1,
       openId: user.openId,
     };
     const updateSet: Record<string, unknown> = {};
 
-    const textFields = ["name", "email", "loginMethod"] as const;
+    const textFields = ["nombre", "email", "loginMethod"] as const;
     type TextField = (typeof textFields)[number];
 
     const assignNullable = (field: TextField) => {
@@ -90,16 +91,16 @@ export async function getUserByOpenId(openId: string) {
 }
 
 // Queries para Profesores
-export async function getProfesores() {
+export async function getProfesores(institucionId: number) {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(profesores);
+  return await db.select().from(profesores).where(eq(profesores.institucion_id, institucionId));
 }
 
-export async function getProfesorById(id: number) {
+export async function getProfesorById(id: number, institucionId: number) {
   const db = await getDb();
   if (!db) return undefined;
-  const result = await db.select().from(profesores).where(eq(profesores.id, id)).limit(1);
+  const result = await db.select().from(profesores).where(and(eq(profesores.id, id), eq(profesores.institucion_id, institucionId))).limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
 
@@ -110,29 +111,29 @@ export async function createProfesor(data: InsertProfesor) {
   return result;
 }
 
-export async function updateProfesor(id: number, data: Partial<InsertProfesor>) {
+export async function updateProfesor(id: number, data: Partial<InsertProfesor>, institucionId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  return await db.update(profesores).set(data).where(eq(profesores.id, id));
+  return await db.update(profesores).set(data).where(and(eq(profesores.id, id), eq(profesores.institucion_id, institucionId)));
 }
 
-export async function deleteProfesor(id: number) {
+export async function deleteProfesor(id: number, institucionId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  return await db.delete(profesores).where(eq(profesores.id, id));
+  return await db.delete(profesores).where(and(eq(profesores.id, id), eq(profesores.institucion_id, institucionId)));
 }
 
 // Queries para Alumnos
-export async function getAlumnos() {
+export async function getAlumnos(institucionId: number) {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(alumnos);
+  return await db.select().from(alumnos).where(eq(alumnos.institucion_id, institucionId));
 }
 
-export async function getAlumnoById(id: number) {
+export async function getAlumnoById(id: number, institucionId: number) {
   const db = await getDb();
   if (!db) return undefined;
-  const result = await db.select().from(alumnos).where(eq(alumnos.id, id)).limit(1);
+  const result = await db.select().from(alumnos).where(and(eq(alumnos.id, id), eq(alumnos.institucion_id, institucionId))).limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
 
@@ -150,67 +151,42 @@ export async function createAlumno(data: InsertAlumno) {
   return result;
 }
 
-export async function updateAlumno(id: number, data: Partial<InsertAlumno>) {
+export async function updateAlumno(id: number, data: Partial<InsertAlumno>, institucionId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  return await db.update(alumnos).set(data).where(eq(alumnos.id, id));
+  return await db.update(alumnos).set(data).where(and(eq(alumnos.id, id), eq(alumnos.institucion_id, institucionId)));
 }
 
-export async function deleteAlumno(id: number) {
+export async function deleteAlumno(id: number, institucionId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  return await db.delete(alumnos).where(eq(alumnos.id, id));
+  return await db.delete(alumnos).where(and(eq(alumnos.id, id), eq(alumnos.institucion_id, institucionId)));
 }
 
-// Queries para Matrícula
-export async function getMatriculas() {
-  const db = await getDb();
-  if (!db) return [];
-  return await db.select().from(matricula);
-}
-
-export async function getMatriculaByAlumnoId(alumnoId: number) {
-  const db = await getDb();
-  if (!db) return undefined;
-  const result = await db.select().from(matricula).where(eq(matricula.alumnoId, alumnoId)).limit(1);
-  return result.length > 0 ? result[0] : undefined;
-}
-
-export async function createMatricula(data: InsertMatricula) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  const result = await db.insert(matricula).values(data);
-  return result;
-}
-
-export async function updateMatricula(id: number, data: Partial<InsertMatricula>) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  return await db.update(matricula).set(data).where(eq(matricula.id, id));
-}
+// Queries para Matrícula (integrada en tabla alumnos)
 
 // Queries para Asistencia IoT
 export async function getAsistenciasIot() {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(asistenciaIot);
+  return await db.select().from(asistencia_iot);
 }
 
 export async function getAsistenciasByAlumnoId(alumnoId: number) {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(asistenciaIot).where(eq(asistenciaIot.alumnoId, alumnoId));
+  return await db.select().from(asistencia_iot).where(eq(asistencia_iot.alumno_id, alumnoId));
 }
 
 export async function createAsistenciaIot(data: InsertAsistenciaIot) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  const result = await db.insert(asistenciaIot).values(data);
+  const result = await db.insert(asistencia_iot).values(data);
   return result;
 }
 
 export async function updateAsistenciaIot(id: number, data: Partial<InsertAsistenciaIot>) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  return await db.update(asistenciaIot).set(data).where(eq(asistenciaIot.id, id));
+  return await db.update(asistencia_iot).set(data).where(eq(asistencia_iot.id, id));
 }

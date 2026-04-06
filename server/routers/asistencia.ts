@@ -2,12 +2,6 @@ import { z } from "zod";
 import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import { getAsistenciasIot, createAsistenciaIot, updateAsistenciaIot, getAlumnoByRfidTag, getAsistenciasByAlumnoId } from "../db";
 
-const asistenciaIotSchema = z.object({
-  alumnoId: z.number(),
-  rfidUid: z.string().min(1, "RFID UID requerido"),
-  tipoEvento: z.enum(["entrada", "salida", "otro"]).default("entrada"),
-});
-
 export const asistenciaRouter = router({
   list: protectedProcedure.query(async () => {
     return await getAsistenciasIot();
@@ -33,11 +27,11 @@ export const asistenciaRouter = router({
         }
 
         const resultado = await createAsistenciaIot({
-          alumnoId: alumno.id,
-          rfidUid: input.rfidUid,
-          tipoEvento: "entrada",
+          institucion_id: alumno.institucion_id,
+          alumno_id: alumno.id,
+          rfid_uid: input.rfidUid,
+          tipo_evento: "Entrada",
           estado: "Puntual",
-          notificacionEnviada: false,
         });
 
         return {
@@ -45,8 +39,8 @@ export const asistenciaRouter = router({
           alumno: {
             id: alumno.id,
             nombres: alumno.nombres,
-            apellidoPaterno: alumno.apellidoPaterno,
-            apellidoMaterno: alumno.apellidoMaterno,
+            apellido_paterno: alumno.apellido_paterno,
+            apellido_materno: alumno.apellido_materno,
             grado: alumno.grado,
             seccion: alumno.seccion,
           },
@@ -65,14 +59,14 @@ export const asistenciaRouter = router({
   // Endpoint para simular escaneo RFID (Pruebas IoT)
   simularEscaneo: protectedProcedure
     .input(z.object({ alumnoId: z.number() }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       try {
         const resultado = await createAsistenciaIot({
-          alumnoId: input.alumnoId,
-          rfidUid: `SIM-${Date.now()}`,
-          tipoEvento: "entrada",
+          institucion_id: ctx.user.institucion_id,
+          alumno_id: input.alumnoId,
+          rfid_uid: `SIM-${Date.now()}`,
+          tipo_evento: "Entrada",
           estado: "Puntual",
-          notificacionEnviada: false,
         });
 
         return {
@@ -90,8 +84,8 @@ export const asistenciaRouter = router({
     }),
 
   update: protectedProcedure
-    .input(z.object({ id: z.number(), data: z.object({ estado: z.enum(["registrado", "notificado", "error"]).optional(), notificacionEnviada: z.boolean().optional() }) }))
-    .mutation(async ({ input }) => {
+    .input(z.object({ id: z.number(), data: z.object({ estado: z.enum(["Puntual", "Tardanza", "Ausente"]).optional() }) }))
+    .mutation(async ({ input, ctx }) => {
       return await updateAsistenciaIot(input.id, input.data);
     }),
 });

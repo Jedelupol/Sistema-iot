@@ -27,11 +27,8 @@ interface ProfesorForm {
   nombres: string;
   apellidoPaterno: string;
   apellidoMaterno: string;
-  genero: "M" | "F" | "Otro";
-  fechaNacimiento: string;
   especialidad?: string;
   telefono?: string;
-  email?: string;
 }
 
 export function ProfesoresPage() {
@@ -43,11 +40,9 @@ export function ProfesoresPage() {
     nombres: "",
     apellidoPaterno: "",
     apellidoMaterno: "",
-    genero: "M",
-    fechaNacimiento: "",
   });
 
-  const { data: profesores, refetch } = trpc.profesores.list.useQuery({});
+  const { data: profesores, refetch } = trpc.profesores.list.useQuery();
   const createMutation = trpc.profesores.create.useMutation({
     onSuccess: () => {
       toast.success("Profesor registrado exitosamente");
@@ -75,8 +70,6 @@ export function ProfesoresPage() {
       nombres: "",
       apellidoPaterno: "",
       apellidoMaterno: "",
-      genero: "M",
-      fechaNacimiento: "",
     });
     setEditingId(null);
     setShowModal(false);
@@ -87,17 +80,13 @@ export function ProfesoresPage() {
       !formData.dni ||
       !formData.nombres ||
       !formData.apellidoPaterno ||
-      !formData.apellidoMaterno ||
-      !formData.fechaNacimiento
+      !formData.apellidoMaterno
     ) {
       toast.error("Por favor completa todos los campos obligatorios");
       return;
     }
 
-    createMutation.mutate({
-      ...formData,
-      fechaNacimiento: new Date(formData.fechaNacimiento),
-    });
+    createMutation.mutate(formData);
   };
 
   const handleDelete = (id: number) => {
@@ -182,9 +171,6 @@ export function ProfesoresPage() {
                     {profesor.apellido_paterno} {profesor.apellido_materno}
                   </TableCell>
                   <TableCell>{profesor.especialidad || "-"}</TableCell>
-                  <TableCell className="text-sm text-slate-600">
-                    {profesor.email || "-"}
-                  </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Button
@@ -280,45 +266,6 @@ export function ProfesoresPage() {
               </div>
               <div>
                 <label className="text-sm font-medium text-slate-700">
-                  Género *
-                </label>
-                <Select
-                  value={formData.genero}
-                  onValueChange={(value) =>
-                    setFormData({
-                      ...formData,
-                      genero: value as "M" | "F" | "Otro",
-                    })
-                  }
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="M">Masculino</SelectItem>
-                    <SelectItem value="F">Femenino</SelectItem>
-                    <SelectItem value="Otro">Otro</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-slate-700">
-                  Fecha de Nacimiento *
-                </label>
-                <Input
-                  type="date"
-                  value={formData.fechaNacimiento}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      fechaNacimiento: e.target.value,
-                    })
-                  }
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-slate-700">
                   Especialidad
                 </label>
                 <Input
@@ -340,20 +287,6 @@ export function ProfesoresPage() {
                     setFormData({ ...formData, telefono: e.target.value })
                   }
                   placeholder="999999999"
-                  className="mt-1"
-                />
-              </div>
-              <div className="col-span-2">
-                <label className="text-sm font-medium text-slate-700">
-                  Email
-                </label>
-                <Input
-                  type="email"
-                  value={formData.email || ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  placeholder="profesor@ejemplo.com"
                   className="mt-1"
                 />
               </div>

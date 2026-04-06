@@ -106,7 +106,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
               fontSize: "14px",
             }}>
               <User size={18} />
-              <span>{user?.name || "Usuario"}</span>
+              <span>{user?.nombre || "Usuario"}</span>
             </div>
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
@@ -140,7 +140,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                   borderBottom: "1px solid #ecf0f1",
                   fontSize: "14px",
                 }}>
-                  <p style={{ margin: 0, fontWeight: "600" }}>{user?.name}</p>
+                  <p style={{ margin: 0, fontWeight: "600" }}>{user?.nombre}</p>
                   <p style={{ margin: 0, fontSize: "12px", color: "#95a5a6" }}>
                     {user?.email}
                   </p>

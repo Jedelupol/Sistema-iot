@@ -52,10 +52,10 @@ export function SeguridadPage() {
 
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{ nombre: string; email: string; rol: "admin" | "director" | "profesor" | "user"; password: string }>({
     nombre: "",
     email: "",
-    rol: "user" as const,
+    rol: "user",
     password: "",
   });
 
