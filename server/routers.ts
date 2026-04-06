@@ -6,6 +6,9 @@ import { profesoresRouter } from "./routers/profesores";
 import { alumnosRouter } from "./routers/alumnos";
 import { matriculaRouter } from "./routers/matricula";
 import { asistenciaRouter } from "./routers/asistencia";
+import { institucionRouter } from "./routers/institucion";
+import { importacionRouter } from "./routers/importacion";
+import { alertasRouter } from "./routers/alertas";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -21,6 +24,9 @@ export const appRouter = router({
     }),
   }),
 
+  institucion: institucionRouter,
+  importacion: importacionRouter,
+  alertas: alertasRouter,
   profesores: profesoresRouter,
   alumnos: alumnosRouter,
   matricula: matriculaRouter,

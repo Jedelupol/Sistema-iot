@@ -43,3 +43,23 @@ export const adminProcedure = t.procedure.use(
     });
   }),
 );
+
+// Middleware para validar licencia
+const requireLicense = t.middleware(async opts => {
+  const { ctx, next } = opts;
+
+  if (!ctx.user) {
+    throw new TRPCError({ code: "UNAUTHORIZED", message: UNAUTHED_ERR_MSG });
+  }
+
+  return next({
+    ctx: {
+      ...ctx,
+      user: ctx.user,
+    },
+  });
+});
+
+export const protectedWithLicenseProcedure = t.procedure.use(requireUser).use(requireLicense);
+
+export const middleware = t.middleware;

@@ -7,6 +7,7 @@ import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { detectarAlertasDesercion } from "../workers/desercionWorker";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -60,6 +61,31 @@ async function startServer() {
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
   });
+
+  // Registrar worker CRON para detección de alertas de deserción
+  // Ejecutar cada domingo a las 2:00 AM
+  const scheduleDesercionWorker = () => {
+    const ahora = new Date();
+    const proximoDomingo = new Date(ahora);
+    proximoDomingo.setDate(
+      proximoDomingo.getDate() + ((0 - proximoDomingo.getDay() + 7) % 7)
+    );
+    proximoDomingo.setHours(2, 0, 0, 0);
+
+    const tiempoHastaProximoEjecutar = proximoDomingo.getTime() - ahora.getTime();
+
+    console.log(
+      `[Worker] Próxima ejecución de detección de deserción: ${proximoDomingo.toISOString()}`
+    );
+
+    setTimeout(() => {
+      detectarAlertasDesercion();
+      // Ejecutar cada 7 días (604800000 ms)
+      setInterval(detectarAlertasDesercion, 7 * 24 * 60 * 60 * 1000);
+    }, tiempoHastaProximoEjecutar);
+  };
+
+  scheduleDesercionWorker();
 }
 
 startServer().catch(console.error);

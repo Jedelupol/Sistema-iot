@@ -1,105 +1,137 @@
-# San Jerónimo IoT - Project TODO
+# sos docente - Plataforma SaaS (Marca Blanca) - Project TODO
 
-## Fase 1: Configuración Base y Estructura
-- [x] Configurar MongoDB schema con colecciones: users, profesores, alumnos, matricula, asistencia_iot, roles
-- [x] Implementar autenticación con roles (Admin/Director/Profesor)
-- [x] Crear endpoints API base para CRUD de entidades principales
-- [ ] Configurar variables de entorno para integración IoT y CallMeBot
+## ARQUITECTURA CORE - 4 PILARES OBLIGATORIOS
 
-## Fase 2: Identidad Visual e Interfaz Principal
-- [x] Crear theme.css institucional con paleta de colores (#3498db azul, #e74c3c rojo, gris oscuro)
-- [x] Implementar Layout Principal: Header fijo con logo I.E. San Jerónimo
-- [x] Implementar Sidebar oscuro con iconos y navegación
-- [x] Implementar Footer con créditos © 2026 I.E. San Jerónimo - V 3.0.0
-- [x] Configurar componentes base (cards, buttons, modales) con estilos institucionales
+### PILAR 1: Núcleo SaaS (Marca Blanca) y Licenciamiento
+- [x] Crear tabla `institucion` con campos: id, nombre, codigo_modular, logo_url, color_primario
+- [x] Implementar niveles_activos (ENUM: Primaria, Secundaria, Ambos)
+- [x] Implementar turnos (ENUM: Mañana, Tarde, Ambos)
+- [x] Implementar tipo_licencia (ENUM: BASICA, PRO, ELITE)
+- [x] Implementar modulos_autorizados (JSON: ["iot", "siagie", "whatsapp", etc])
+- [x] Agregar campos de vencimiento de licencia
+- [ ] Crear lógica de validación por licencia en routers tRPC
+- [ ] Implementar middleware que bloquea acceso a módulos no autorizados
 
-## Fase 3: Dashboard
-- [x] Crear vista Dashboard con 4 tarjetas de estadísticas (total profesores, total alumnos, asistencias hoy, pendientes)
-- [x] Implementar gráfico de flujo semanal de asistencia (recharts)
-- [ ] Conectar datos en tiempo real desde backend
-- [ ] Añadir filtros por fecha y rango
+### PILAR 2: Identidad Estudiantil e Importador SIAGIE
+- [x] Crear tabla `alumnos` con codigo_siagie (14 dígitos) como PRIMARY KEY UNIQUE
+- [x] Mantener dni (8 dígitos) como UNIQUE pero permitiendo nulos
+- [x] Agregar campos: nombres, apellido_paterno, apellido_materno, genero, fecha_nacimiento
+- [x] Agregar campos: rfid_tag, grado, seccion, nivel (Primaria/Secundaria), estado, fecha_matricula
+- [ ] Crear endpoint POST `/api/importar/acta-siagie` para importación masiva
+- [ ] Implementar parser de Excel/CSV que localiza columna de estudiantes
+- [ ] Implementar lógica de UPSERT basada en codigo_siagie
+- [ ] Crear tabla `importaciones_siagie` para auditoría de importaciones
+- [ ] Validar que codigo_siagie no se duplica durante importación
 
-## Fase 4: Módulo Profesores
-- [x] Crear schema MongoDB para profesores (DNI, nombres, apellidos, género, fecha nacimiento, usuario, contraseña)
-- [x] Implementar CRUD completo (Create, Read, Update, Delete)
-- [x] Crear formulario modal para registro/edición de profesores
-- [x] Implementar listado con paginación y filtros (DNI, nombre, apellido)
-- [x] Validar campos obligatorios en backend
-- [x] Crear endpoints API: GET /api/profesores, POST /api/profesores, PUT /api/profesores/:id, DELETE /api/profesores/:id
+### PILAR 3: Horarios Dinámicos y Motor de Asistencia IoT
+- [x] Crear tabla `sesiones_docente` con: profesor_id, dia_semana, hora_inicio, hora_fin, curso
+- [x] Agregar campos: grado, seccion, aula, estado
+- [x] Crear tabla `asistencia_iot` con: rfid_uid, timestamp, tipo_evento (Entrada/Salida), estado
+- [x] Agregar campo sesion_id para vincular con sesiones_docente
+- [x] Agregar campo estado (Puntual/Tardanza/Ausente)
+- [ ] Actualizar endpoint POST `/api/iot/asistencia` para:
+  - [ ] Recibir rfidUid del ESP32
+  - [ ] Validar que RFID existe en alumnos o profesores
+  - [ ] Buscar sesiones_docente del día actual
+  - [ ] Comparar timestamp contra hora_inicio para calcular estado
+  - [ ] Registrar asistencia con estado automático
+  - [ ] Retornar datos del alumno/profesor para notificaciones
+- [ ] Crear lógica de cálculo: Puntual (timestamp <= hora_inicio), Tardanza (timestamp > hora_inicio)
 
-## Fase 5: Módulo Alumnos
-- [x] Crear schema MongoDB para alumnos (DNI, nombres, apellidos, género, fecha nacimiento, RFID Tag, usuario, contraseña, grado, sección)
-- [x] Implementar CRUD completo
-- [x] Crear formulario modal para registro/edición con campo RFID Tag obligatorio
-- [x] Implementar listado con paginación, filtros y búsqueda avanzada
-- [x] Crear vista de historial de asistencia por alumno
-- [x] Crear endpoints API: GET /api/alumnos, POST /api/alumnos, PUT /api/alumnos/:id, DELETE /api/alumnos/:id, GET /api/alumnos/:id/asistencia
+### PILAR 4: Alertas Tempranas de Deserción
+- [x] Crear tabla `alertas_desercion` con: alumno_id, nivel_riesgo, fecha_deteccion, estado_revision
+- [x] Agregar campos: razon, revisado_por, fecha_revision, notas_director
+- [x] Agregar campo estado_revision (Pendiente/Revisado/Resuelto/Descartado)
+- [ ] Crear worker/CRON que ejecute semanalmente:
+  - [ ] Evalúa tabla asistencia_iot de los últimos 7 días
+  - [ ] Cuenta faltas por alumno (registros con estado = "Ausente")
+  - [ ] Si alumno >= 3 faltas en 7 días: inserta alerta con nivel_riesgo = "Alto"
+  - [ ] Si alumno >= 2 faltas en 7 días: inserta alerta con nivel_riesgo = "Medio"
+  - [ ] Evita duplicados: no inserta si ya existe alerta Pendiente para ese alumno
+- [ ] Crear endpoint GET `/api/alertas/desercion` para dashboard del director
+- [ ] Crear notificación automática al director cuando se detecta alerta
 
-## Fase 6: Módulo Matrícula
-- [ ] Crear schema MongoDB para matrícula (alumno_id, grado, sección, año, estado)
-- [ ] Implementar formulario modal para registro de nuevos ingresos
-- [ ] Validar asignación de grados y secciones
-- [ ] Generar automáticamente credenciales de usuario para alumnos nuevos
-- [ ] Crear endpoints API: POST /api/matricula, GET /api/matricula/:alumno_id, PUT /api/matricula/:id
+---
 
-## Fase 7: Módulo Asistencia IoT
-- [ ] Crear schema MongoDB para asistencia_iot (alumno_id, rfid_uid, timestamp, tipo_evento, estado)
-- [ ] Implementar endpoint POST /api/iot/asistencia para recibir datos del ESP32
-- [ ] Crear monitor en tiempo real que muestre ingresos de alumnos
-- [ ] Implementar notificaciones en pantalla al detectar RFID
-- [ ] Validar que RFID_Tag existe en base de datos antes de registrar
-- [ ] Crear endpoints API: POST /api/iot/asistencia, GET /api/iot/monitor, GET /api/iot/eventos
+## FASE 2: GENERACIÓN DE MIGRACIONES SQL
+- [x] Ejecutar `pnpm drizzle-kit generate` para generar SQL
+- [x] Revisar archivo SQL generado en `drizzle/`
+- [x] Verificar relaciones One-to-Many correctas
+- [x] Aplicar migración con `pnpm exec drizzle-kit migrate`
 
-## Fase 8: Módulo Consultas
-- [ ] Crear vista de buscador avanzado por DNI o apellidos
-- [ ] Implementar búsqueda instantánea con debounce
-- [ ] Mostrar resultados de alumnos y profesores
-- [ ] Crear vista de historial completo de asistencias por alumno
-- [ ] Implementar filtros por rango de fecha
-- [ ] Crear endpoints API: GET /api/consultas/buscar, GET /api/consultas/historial/:alumno_id
+---
 
-## Fase 9: Módulo Informes
-- [ ] Crear generador de reportes mensuales
-- [ ] Implementar exportación a PDF con librería (pdfkit o similar)
-- [ ] Implementar exportación a Excel con librería (xlsx o similar)
-- [ ] Incluir estadísticas por grado, sección y alumno
-- [ ] Crear filtros por mes, grado, sección
-- [ ] Crear endpoints API: GET /api/informes/pdf, GET /api/informes/excel
+## FASE 3: ACTUALIZAR ROUTERS tRPC CON VALIDACIÓN POR LICENCIA
+- [x] Crear middleware `checkLicense` que valida tipo_licencia e institucion_id
+- [x] Crear middleware `checkModuleAccess` que valida modulos_autorizados
+- [x] Crear router institucion con endpoints de validación
+- [x] Bloquear acceso a módulos no autorizados con error FORBIDDEN
+- [x] Crear endpoint GET `/api/institucion/licencia` para obtener estado actual
 
-## Fase 10: Módulo Seguridad
-- [ ] Implementar gestión de usuarios con roles (Admin/Director/Profesor)
-- [ ] Crear vista de administración de usuarios
-- [ ] Implementar gestión de contraseñas (cambio, reset)
-- [ ] Crear sistema de permisos diferenciados por rol
-- [ ] Implementar logs de acceso al sistema
-- [ ] Crear endpoints API: GET /api/usuarios, POST /api/usuarios, PUT /api/usuarios/:id, DELETE /api/usuarios/:id
+---
 
-## Fase 11: Simulador SITL y Pruebas IoT
-- [ ] Crear vista especial "Pruebas IoT" con selector de alumnos
-- [ ] Implementar simulación de escaneo RFID
-- [ ] Validar registro en base de datos
-- [ ] Validar notificación en pantalla
-- [ ] Crear endpoints API: POST /api/iot/simular
+## FASE 4: ENDPOINT DE IMPORTACIÓN SIAGIE
+- [x] Crear endpoint POST `/api/importar/acta-siagie`
+- [x] Implementar validación de archivo (Excel/CSV)
+- [x] Implementar parser que localiza columna de estudiantes
+- [x] Implementar UPSERT masivo basado en codigo_siagie
+- [x] Registrar importación en tabla `importaciones_siagie`
+- [x] Retornar resumen: cantidad_registros, cantidad_exitosos, cantidad_errores
+- [x] Crear endpoint GET `/api/importar/historial` para ver historial de importaciones
 
-## Fase 12: Integración CallMeBot WhatsApp
-- [ ] Configurar integración con API CallMeBot
-- [ ] Implementar notificaciones automáticas por WhatsApp a apoderados
-- [ ] Crear templates de mensajes para alertas de asistencia
-- [ ] Validar entrega de mensajes
-- [ ] Crear endpoints API: POST /api/notificaciones/whatsapp
+---
 
-## Fase 13: Pruebas y Validación
-- [ ] Escribir vitest para endpoints API críticos
-- [ ] Validar flujos de autenticación
-- [ ] Validar CRUD de todas las entidades
-- [ ] Validar integración IoT
-- [ ] Validar generación de reportes
-- [ ] Pruebas de rendimiento
+## FASE 5: WORKER CRON PARA ALERTAS DE DESERCIÓN
+- [x] Crear archivo `server/workers/desercionWorker.ts`
+- [x] Implementar función que evalúa asistencias de últimos 7 días
+- [x] Implementar lógica de conteo de faltas por alumno
+- [x] Implementar inserción de alertas automáticas
+- [x] Registrar worker en `server/_core/index.ts` con schedule semanal
+- [x] Crear logs para auditoría de ejecución del worker
 
-## Fase 14: Integración Final y Entrega
-- [ ] Verificar todos los módulos funcionan correctamente
-- [ ] Validar identidad visual en todos los módulos
-- [ ] Crear documentación de API
-- [ ] Crear guía de usuario
-- [ ] Realizar pruebas end-to-end
-- [ ] Generar checkpoint final
+---
+
+## FASE 6: VALIDACIÓN FINAL DE ARQUITECTURA
+- [x] Verificar que todas las relaciones One-to-Many funcionan correctamente
+- [x] Verificar que codigo_siagie es la llave principal de búsqueda
+- [x] Verificar que licencia bloquea módulos no autorizados
+- [x] Verificar que sesiones_docente calcula estado de asistencia correctamente
+- [x] Verificar que alertas de deserción se generan automáticamente
+- [ ] Crear checkpoint de arquitectura core
+
+---
+
+## MÓDULOS FUNCIONALES
+- [x] Dashboard con estadísticas por institucion
+- [ ] Módulo Profesores (CRUD)
+- [x] Módulo Alumnos (CRUD)
+- [ ] Módulo Matrícula (CRUD)
+- [x] Módulo Asistencia IoT (Monitor en tiempo real)
+- [ ] Módulo Consultas (Búsqueda avanzada)
+- [ ] Módulo Informes (Reportes PDF/Excel)
+- [ ] Módulo Seguridad (Gestión de usuarios y roles)
+- [x] Simulador SITL (Pruebas IoT)
+- [x] Integración CallMeBot WhatsApp (Notificaciones)
+
+---
+
+## FRONTEND - COMPONENTES Y LAYOUT
+- [x] DashboardLayoutSaas con Sidebar colapsable
+- [x] Componente useModuleState (Zustand)
+- [x] Página DashboardMain con gráficos (Recharts)
+- [x] Página AlumnosPage con tabla y modal CRUD
+- [x] Página MonitorIoT con monitor en tiempo real
+- [x] Página SimuladorSITL para pruebas manuales
+- [x] App.tsx actualizado con rutas y autenticación
+- [x] Servicio CallMeBotService para notificaciones WhatsApp
+
+---
+
+## NOTAS ARQUITECTÓNICAS
+- Base de datos: MySQL (Drizzle ORM)
+- Identificador principal de alumno: codigo_siagie (MINEDU)
+- Identificador secundario de alumno: dni (puede ser nulo)
+- Motor de asistencia: Basado en sesiones_docente dinámicas
+- Cálculo de estado: Comparación timestamp vs hora_inicio
+- Alertas: Generadas automáticamente por worker CRON semanal
+- Licenciamiento: Controla qué módulos ve cada institución
