@@ -32,7 +32,7 @@ export const alumnosRouter = router({
   create: protectedProcedure.input(alumnoSchema).mutation(async ({ input }) => {
     return await createAlumno({
       ...input,
-      estado: "activo",
+      estado: "Activo",
     });
   }),
 

@@ -36,7 +36,7 @@ export const asistenciaRouter = router({
           alumnoId: alumno.id,
           rfidUid: input.rfidUid,
           tipoEvento: "entrada",
-          estado: "registrado",
+          estado: "Puntual",
           notificacionEnviada: false,
         });
 
@@ -71,7 +71,7 @@ export const asistenciaRouter = router({
           alumnoId: input.alumnoId,
           rfidUid: `SIM-${Date.now()}`,
           tipoEvento: "entrada",
-          estado: "registrado",
+          estado: "Puntual",
           notificacionEnviada: false,
         });
 

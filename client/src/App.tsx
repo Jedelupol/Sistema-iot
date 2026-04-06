@@ -7,20 +7,25 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { DashboardLayoutSaas } from "@/components/DashboardLayoutSaas";
 import { DashboardMain } from "@/pages/DashboardMain";
 import { AlumnosPage } from "@/pages/AlumnosPage";
+import { ProfesoresPage } from "@/pages/ProfesoresPage";
+import { MatriculaPage } from "@/pages/MatriculaPage";
 import { MonitorIoT } from "@/pages/MonitorIoT";
 import { SimuladorSITL } from "@/pages/SimuladorSITL";
+import { ConsultasPage } from "@/pages/ConsultasPage";
+import { InformesPage } from "@/pages/InformesPage";
+import { SeguridadPage } from "@/pages/SeguridadPage";
 import { useModuleState } from "@/hooks/useModuleState";
 import {
   LayoutDashboard,
   Users,
   Radio,
   Zap,
-  AlertTriangle,
   FileText,
   Lock,
   Upload,
+  Search,
 } from "lucide-react";
-import { Loader2 } from "lucide-react";
+
 
 function DashboardRouter() {
   const { activeModule } = useModuleState();
@@ -29,12 +34,22 @@ function DashboardRouter() {
     switch (activeModule) {
       case "dashboard":
         return <DashboardMain />;
+      case "profesores":
+        return <ProfesoresPage />;
       case "alumnos":
         return <AlumnosPage />;
+      case "matricula":
+        return <MatriculaPage />;
       case "monitor-iot":
         return <MonitorIoT />;
       case "simulador-sitl":
         return <SimuladorSITL />;
+      case "consultas":
+        return <ConsultasPage />;
+      case "informes":
+        return <InformesPage />;
+      case "seguridad":
+        return <SeguridadPage />;
       default:
         return (
           <div className="flex items-center justify-center h-96">
@@ -51,9 +66,19 @@ function DashboardRouter() {
       icon: <LayoutDashboard size={20} />,
     },
     {
+      id: "profesores",
+      label: "Profesores",
+      icon: <Users size={20} />,
+    },
+    {
       id: "alumnos",
       label: "Alumnos",
       icon: <Users size={20} />,
+    },
+    {
+      id: "matricula",
+      label: "Matrícula",
+      icon: <Upload size={20} />,
     },
     {
       id: "monitor-iot",
@@ -67,9 +92,9 @@ function DashboardRouter() {
       icon: <Zap size={20} />,
     },
     {
-      id: "alertas",
-      label: "Alertas",
-      icon: <AlertTriangle size={20} />,
+      id: "consultas",
+      label: "Consultas",
+      icon: <Search size={20} />,
     },
     {
       id: "informes",
@@ -80,11 +105,6 @@ function DashboardRouter() {
       id: "seguridad",
       label: "Seguridad",
       icon: <Lock size={20} />,
-    },
-    {
-      id: "importar",
-      label: "Importar SIAGIE",
-      icon: <Upload size={20} />,
     },
   ];
 

@@ -103,13 +103,13 @@
 
 ## MÓDULOS FUNCIONALES
 - [x] Dashboard con estadísticas por institucion
-- [ ] Módulo Profesores (CRUD)
+- [x] Módulo Profesores (CRUD)
 - [x] Módulo Alumnos (CRUD)
-- [ ] Módulo Matrícula (CRUD)
+- [x] Módulo Matrícula (CRUD)
 - [x] Módulo Asistencia IoT (Monitor en tiempo real)
-- [ ] Módulo Consultas (Búsqueda avanzada)
-- [ ] Módulo Informes (Reportes PDF/Excel)
-- [ ] Módulo Seguridad (Gestión de usuarios y roles)
+- [x] Módulo Consultas (Búsqueda avanzada)
+- [x] Módulo Informes (Reportes PDF/Excel)
+- [x] Módulo Seguridad (Gestión de usuarios y roles)
 - [x] Simulador SITL (Pruebas IoT)
 - [x] Integración CallMeBot WhatsApp (Notificaciones)
 
@@ -119,9 +119,14 @@
 - [x] DashboardLayoutSaas con Sidebar colapsable
 - [x] Componente useModuleState (Zustand)
 - [x] Página DashboardMain con gráficos (Recharts)
+- [x] Página ProfesoresPage con tabla y modal CRUD
 - [x] Página AlumnosPage con tabla y modal CRUD
+- [x] Página MatriculaPage con importador SIAGIE
 - [x] Página MonitorIoT con monitor en tiempo real
 - [x] Página SimuladorSITL para pruebas manuales
+- [x] Página ConsultasPage con búsqueda avanzada
+- [x] Página InformesPage con generador de reportes
+- [x] Página SeguridadPage con gestión de usuarios
 - [x] App.tsx actualizado con rutas y autenticación
 - [x] Servicio CallMeBotService para notificaciones WhatsApp
 

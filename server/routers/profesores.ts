@@ -26,7 +26,7 @@ export const profesoresRouter = router({
   create: protectedProcedure.input(profesorSchema).mutation(async ({ input }) => {
     return await createProfesor({
       ...input,
-      estado: "activo",
+      estado: "Activo",
     });
   }),
 

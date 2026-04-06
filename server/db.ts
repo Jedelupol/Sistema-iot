@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, profesores, alumnos, matricula, asistenciaIot, logsAcceso, Profesor, InsertProfesor, Alumno, InsertAlumno, Matricula, InsertMatricula, AsistenciaIot, InsertAsistenciaIot } from "../drizzle/schema";
+import { InsertUser, users, profesores, alumnos, Profesor, InsertProfesor, Alumno, InsertAlumno, asistencia_iot, InsertAsistenciaIot, alertas_desercion } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -139,7 +139,7 @@ export async function getAlumnoById(id: number) {
 export async function getAlumnoByRfidTag(rfidTag: string) {
   const db = await getDb();
   if (!db) return undefined;
-  const result = await db.select().from(alumnos).where(eq(alumnos.rfidTag, rfidTag)).limit(1);
+  const result = await db.select().from(alumnos).where(eq(alumnos.rfid_tag, rfidTag)).limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
 

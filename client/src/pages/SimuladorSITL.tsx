@@ -52,7 +52,7 @@ export function SimuladorSITL() {
     const alumnoSelec = alumnos?.find((a) => a.id === parseInt(alumnoSeleccionado));
     const uid = rfidUid || alumnoSelec?.rfid_tag || "";
 
-    simularMutation.mutate({ rfid_uid: uid });
+    simularMutation.mutate({ rfidUid: uid });
   };
 
   return (
